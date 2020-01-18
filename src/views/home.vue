@@ -14,7 +14,7 @@
       <el-aside :width="isCollapse ? '64px' : '200px'">
         <div class="toggle-button" @click="toggleCollapse">|||</div>
         <!-- 侧边栏菜单区域 -->
-        <el-menu ref="menu" background-color="#333744" text-color="#fff" active-text-color="#409eff" unique-opened :collapse="isCollapse" :collapse-transition="false" router :default-active="$route.path" @open="record">
+        <el-menu ref="menu" background-color="#333744" text-color="#fff" active-text-color="#409eff" unique-opened :collapse="isCollapse" :collapse-transition="false" router :default-active="$route.path">
           <!-- 一级菜单 -->
           <el-submenu :index="`${index}`" v-for="(item,index) of menulist" :key="index">
             <template slot="title">
@@ -55,7 +55,7 @@ export default {
         "icon-baobiao"
       ],
       isCollapse: false,
-      index: ""
+      index: Number
     }
   },
   created() {
@@ -69,17 +69,16 @@ export default {
     toggleCollapse() {
       this.isCollapse = !this.isCollapse
     },
-    record(index) {
-      this.index = index
-    },
     goHome() {
-      this.$refs.menu.close(this.index)
-      this.index = ""
+      for (let i = 0; i < this.index; i++) {
+        this.$refs.menu.close(`${i}`)
+      }
     },
     async getMenuList() {
       const { data: res } = await this.$axios.get("/menus")
       if (res.meta.status == 200) {
         this.menulist = res.data
+        this.index = res.data.length
       } else {
         this.$message.error(res.meta.msg)
       }
