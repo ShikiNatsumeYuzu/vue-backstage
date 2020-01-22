@@ -33,7 +33,7 @@
           <!-- 修改按钮 -->
           <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(slot.row.id)"></el-button>
           <!-- 删除按钮 -->
-          <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
+          <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeUserById(slot.row.id)"></el-button>
           <!-- 分配角色 -->
           <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
             <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
@@ -175,6 +175,25 @@ export default {
     this.getUserList()
   },
   methods: {
+    // 根据id删除对应的用户信息
+    removeUserById(id) {
+      // 弹框询问用户是否删除数据
+      this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        const { data: res } = await this.$axios.delete(`/users/${id}`)
+        if (res.meta.status == 200) {
+          this.getUserList();
+          this.$message.success('删除用户成功!');
+        } else {
+          this.$message.error('删除用户失败!');
+        }
+      }).catch(() => {
+        this.$message.info('已取消删除');
+      });
+    },
     // 修改用户信息并提交
     editUserInfo() {
       this.$refs.editFormRef.validate(async valid => {
